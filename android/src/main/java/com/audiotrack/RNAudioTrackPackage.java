@@ -17,7 +17,7 @@ public class RNAudioTrackPackage implements ReactPackage {
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
       List<NativeModule> modules = new ArrayList<>();
-      modules.add(new RNLiveAudioStreamModule(reactContext));
+      modules.add(new RNAudioTrackPackage(reactContext));
       return modules;
     }
 
