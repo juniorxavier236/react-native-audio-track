@@ -29,7 +29,7 @@ public class RNAudioTrackModule extends ReactContextBaseJavaModule {
     private static AudioTrack audioTrack;
     private boolean isFloat = false;
 
-    int bufferSize = 8192;
+    int bufferSize = 2048;
 
     public RNAudioTrackModule(ReactApplicationContext reactContext) {
         super(reactContext);
@@ -49,7 +49,7 @@ public class RNAudioTrackModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void init(final ReadableMap options) {
         int streamType = AudioManager.STREAM_MUSIC;
-        int sampleRateInHz = 44100;
+        int sampleRateInHz = 8000;
         int channelConfig = AudioFormat.CHANNEL_OUT_MONO;
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         int mode = AudioTrack.MODE_STREAM;
@@ -87,17 +87,18 @@ public class RNAudioTrackModule extends ReactContextBaseJavaModule {
 //            Log.d("recorder", "setting buffer size " + bufferSize);
 //        }
         audioTrack = new AudioTrack(streamType, sampleRateInHz, channelConfig, audioFormat, bufferSize, mode);
+        audioTrack.play();
     }
 
     @ReactMethod
-    public void Play() {
+    public void play() {
         if (audioTrack != null) {
             audioTrack.play();
         }
     }
 
     @ReactMethod
-    public void Stop() {
+    public void stop() {
         if (audioTrack != null) {
             audioTrack.stop();
             audioTrack.release();
@@ -106,39 +107,39 @@ public class RNAudioTrackModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void Pause() {
+    public void pause() {
         if (audioTrack != null) {
             audioTrack.pause();
         }
     }
 
     @ReactMethod
-    public void SetVolume(float gain) {
+    public void setVolume(float gain) {
         if (audioTrack != null) {
             audioTrack.setVolume(gain);
         }
     }
 
     @ReactMethod
-    public void Write(String base64String) {
+    public void write(String base64String) {
         byte[] bytesArray = Base64.decode(base64String, Base64.NO_WRAP);
         if (audioTrack != null && bytesArray != null) {
-            if (isFloat && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // if (isFloat && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-                FloatBuffer fb = ByteBuffer.wrap(bytesArray).asFloatBuffer();
-                float[] buffer = new float[fb.capacity()];
-                ByteBuffer.wrap(bytesArray).order(ByteOrder.nativeOrder()).asFloatBuffer().get(buffer);
-                try {
-                    audioTrack.write(buffer, 0, buffer.length, AudioTrack.WRITE_BLOCKING);
-                } catch (Exception ignored) {
-                }
-            } else {
+            //     FloatBuffer fb = ByteBuffer.wrap(bytesArray).asFloatBuffer();
+            //     float[] buffer = new float[fb.capacity()];
+            //     ByteBuffer.wrap(bytesArray).order(ByteOrder.nativeOrder()).asFloatBuffer().get(buffer);
+            //     try {
+            //         audioTrack.write(buffer, 0, buffer.length, AudioTrack.WRITE_BLOCKING);
+            //     } catch (Exception ignored) {
+            //     }
+            // } else {
                 short[] buffer = byte2short(bytesArray);
                 try {
-                    audioTrack.write(buffer, 0, bufferSize);
+                    audioTrack.write(buffer, 0, buffer.length);
                 } catch (Exception ignored) {
                 }
-            }
+            // }
         }
     }
 
